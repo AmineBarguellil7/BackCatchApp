@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const User = require('../model/user');
+
 const secretKey = process.env.JWT_SECRET_KEY || 'mysecretkey';
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -65,13 +66,13 @@ const verifyToken = (req, res, next) => {
 };
 
 //////////////////////////
-router.put('/update/:id', async (req, res) => {
+router.put('/update/:id', verifyToken, async (req, res) => {
   const { fname, lname, birthdate, phone } = req.body;
   const userId = req.params.id;
 
   try {
     // Find user by ID
-    const user = await mongoose.connection.collection('users').findOne({ _id: userId });
+    const user = await User.findOne({ _id: userId });
 
     // If user not found, return error response
     if (!user) {
@@ -85,14 +86,31 @@ router.put('/update/:id', async (req, res) => {
     user.phone = phone || user.phone;
 
     // Save updated user to database
-    await mongoose.connection.collection('users').updateOne({ _id: userId }, { $set: user });
+    await user.save();
 
     res.json({ message: 'User updated' });
   } catch (err) {
     console.error('Error updating user', err);
     res.status(500).json({ message: 'Internal server error' });
   }
+  ///////////////////////////
+  router.delete('/:id', verifyToken, async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const deletedUser = await User.findOneAndDelete({ _id: userId });
+  
+      if (!deletedUser) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      res.json({ message: 'User deleted' });
+    } catch (err) {
+      console.error('Error deleting user', err);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  });
 });
+
 
 
 
