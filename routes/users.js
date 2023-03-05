@@ -7,9 +7,18 @@ const User = require('../model/user');
 
 const secretKey = process.env.JWT_SECRET_KEY || 'mysecretkey';
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+router.get('/', async (req, res) => {
+  try {
+    const users = await User.find({});
+    res.json(users);
+
+  } catch (err) {
+    console.error('Error fetching users', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
 });
+
+/////////////////////////////////////////////////////////////////////////////////////
 router.post('/signup', async (req, res) => {
   const { fname, lname, birthdate, phone, email, password } = req.body;
 
@@ -64,8 +73,23 @@ const verifyToken = (req, res, next) => {
     res.status(401).json({ message: 'Invalid token' });
   }
 };
+//////////////////////////////////////get by id/////////////////////////////////////
+router.get('/:id',  async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const user = await User.findOne({ _id: userId });
 
-//////////////////////////
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json(user);
+  } catch (err) {
+    console.error('Error getting user', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+//////////////////////////update//////////////////////////
 router.put('/update/:id', verifyToken, async (req, res) => {
   const { fname, lname, birthdate, phone } = req.body;
   const userId = req.params.id;
@@ -109,8 +133,43 @@ router.put('/update/:id', verifyToken, async (req, res) => {
       res.status(500).json({ message: 'Internal server error' });
     }
   });
-});
 
+});
+//////////////////////update password////////////////////
+router.put('/:id', verifyToken, async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+  const userId = req.params.id;
+
+  try {
+    // Find user by ID
+    const user = await User.findOne({ _id: userId });
+
+    // If user not found, return error response
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Check if old password matches with stored password
+    const isOldPasswordCorrect = await bcrypt.compare(oldPassword, user.password);
+    if (!isOldPasswordCorrect) {
+      return res.status(401).json({ message: 'Incorrect old password' });
+    }
+
+    // Hash the new password
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update user password
+    user.password = hashedNewPassword;
+
+    // Save updated user to database
+    await user.save();
+
+    res.json({ message: 'Password updated' });
+  } catch (err) {
+    console.error('Error updating password', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 
 
