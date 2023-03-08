@@ -13,7 +13,6 @@ var User = new Schema({
       },
       birthdate: {
         type: Date,
-        required: true,
       },
       phone: {
         type: Number,
