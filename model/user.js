@@ -32,6 +32,11 @@ var User = new Schema({
         type: Boolean,
         default: false,
       },
+      isActivated: {
+        type: Boolean,
+        default: false,
+      }
+      
       
 });
 
