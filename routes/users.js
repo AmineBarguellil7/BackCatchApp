@@ -74,7 +74,7 @@ router.post('/signin', async (req, res) => {
     return res.status(401).json({ message: 'Invalid email or password' });
   }
   ////////////////ckeck if verified///////////
-  if (user && await bcrypt.compare(password, user.password) && !user.isVerified){
+  if (user.isActivated==false){
     return res.status(401).json({ message: 'please verify your email to verify your account' });
   }
   // Generate JWT token
@@ -268,32 +268,6 @@ router.post('/forgot-password', async (req, res) => {
     return res.status(500).json({ message: 'Internal server error' });
   }
 });
-//////////////////////activate//////////////////////////////
-// router.get("/verify-email/:randomCode", async (req, res) => {
-//   User.findOne({
-//     randomCode: req.params.randomCode,
-//   })
-//   try {
-//     // Find user by ID
-//     const user = User.findOne({ randomCode:randomCode  });
-
-//     // If user not found, return error response
-//     if (!user) {
-//       return res.status(404).json({ message: 'User not found' });
-//     }
-
-//   // Set isActivated to true
-//   user.isActivated = true;
-
-//   // Save updated user to database
-//   await user.save();
-
-//   return { success: true, message: 'User activated' };
-//   }catch (err) {
-//     console.error('Error activating user', err);
-//     return { success: false, message: 'Internal server error' };
-//   }
-// });
 
 
 
