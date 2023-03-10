@@ -22,7 +22,12 @@ router.get('/', async (req, res) => {
 /////////////////////////////////////////////////////////////////////////////////////signup////////////////
 router.post('/signup', async (req, res) => {
   const { fname, lname, birthdate, phone, email, password } = req.body;
-
+  const characters =
+    "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let randomCode = "";
+  for (let i = 0; i < 25; i++) {
+    randomCode += characters[Math.floor(Math.random() * characters.length)];
+  }
   // Hash the password
   const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -34,7 +39,8 @@ router.post('/signup', async (req, res) => {
     phone,
     email,
     password: hashedPassword,
-    verificationToken: crypto.randomBytes(20).toString('hex')
+    verificationToken: crypto.randomBytes(20).toString('hex'),
+    
   });
 
   try {
@@ -46,7 +52,7 @@ router.post('/signup', async (req, res) => {
       from: 'hkyosri@gmail.com',
       to: user.email,
       subject: 'Verify your email address',
-      text: `Please click on this link to verify your email address: http://localhost:3000/verify-email/${user.verificationToken}`
+      text: `Please click on this link to verify your email address: http://localhost:3000/users/verify-email/${user.verificationToken}`
     };
 
     await transporter.sendMail(mailOptions);
@@ -68,8 +74,8 @@ router.post('/signin', async (req, res) => {
     return res.status(401).json({ message: 'Invalid email or password' });
   }
   ////////////////ckeck if verified///////////
-  if (user.isVerified){
-    return res.status(401).json({ message: 'please verify your account' });
+  if (user && await bcrypt.compare(password, user.password) && !user.isVerified){
+    return res.status(401).json({ message: 'please verify your email to verify your account' });
   }
   // Generate JWT token
   const token = jwt.sign({ userId: user._id }, secretKey, { expiresIn: '1h' });
@@ -133,6 +139,7 @@ router.put('/update/:id', verifyToken, async (req, res) => {
     console.error('Error updating user', err);
     res.status(500).json({ message: 'Internal server error' });
   }
+});
   ///////////////////////////
   router.delete('/:id', verifyToken, async (req, res) => {
     try {
@@ -150,7 +157,7 @@ router.put('/update/:id', verifyToken, async (req, res) => {
     }
   });
 
-});
+
 //////////////////////update password////////////////////
 router.put('/:id', verifyToken, async (req, res) => {
   const { oldPassword, newPassword } = req.body;
@@ -195,9 +202,10 @@ const transporter = nodemailer.createTransport({
     pass: 'ujglsqtoifiomukc'
   }
 });
+
 //////////////////////////////////is verified email
 router.get('/verify-email/:verificationToken', async (req, res) => {
-  const token = req.params.token;
+  const token = req.params.verificationToken;
 
   try {
     // Find user by verification token
@@ -209,7 +217,7 @@ router.get('/verify-email/:verificationToken', async (req, res) => {
     }
 
     // Update user's isVerified flag
-    user.isVerified = true;
+    user.isActivated = true;
     user.verificationToken = undefined;
     await user.save();
 
@@ -239,7 +247,7 @@ router.post('/forgot-password', async (req, res) => {
 
     // send the new password to the user's email
     const mailOptions = {
-      from: process.env.EMAIL,
+      from: "hkyosri@gmail.com",
       to: email,
       subject: 'Your New Password',
       text: `Dear user, note that after your request to recover password your new one will be
@@ -260,7 +268,32 @@ router.post('/forgot-password', async (req, res) => {
     return res.status(500).json({ message: 'Internal server error' });
   }
 });
+//////////////////////activate//////////////////////////////
+// router.get("/verify-email/:randomCode", async (req, res) => {
+//   User.findOne({
+//     randomCode: req.params.randomCode,
+//   })
+//   try {
+//     // Find user by ID
+//     const user = User.findOne({ randomCode:randomCode  });
 
+//     // If user not found, return error response
+//     if (!user) {
+//       return res.status(404).json({ message: 'User not found' });
+//     }
+
+//   // Set isActivated to true
+//   user.isActivated = true;
+
+//   // Save updated user to database
+//   await user.save();
+
+//   return { success: true, message: 'User activated' };
+//   }catch (err) {
+//     console.error('Error activating user', err);
+//     return { success: false, message: 'Internal server error' };
+//   }
+// });
 
 
 

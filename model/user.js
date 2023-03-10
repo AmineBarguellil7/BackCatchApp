@@ -35,8 +35,10 @@ var User = new Schema({
       isActivated: {
         type: Boolean,
         default: false,
-      }
-      
+      },
+      verificationToken: {type:String},
+
+
       
 });
 
