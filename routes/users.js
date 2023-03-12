@@ -63,7 +63,7 @@ router.post('/signup', async (req, res) => {
   }
 });
 ////////////////////////////////////////////signin//////////////////////////////
-router.post('/signin', async (req, res) => {
+router.post('/signin',async (req, res) => {
   const { email, password } = req.body;
 
   // Find user by email
@@ -76,6 +76,10 @@ router.post('/signin', async (req, res) => {
   ////////////////ckeck if verified///////////
   if (user.isActivated==false){
     return res.status(401).json({ message: 'please verify your email to verify your account' });
+  }
+  ////////////////ckeck if verified///////////
+  if (user.isBanned==true){
+    return res.status(401).json({ message: 'your account is banned' });
   }
   // Generate JWT token
   const token = jwt.sign({ userId: user._id }, secretKey, { expiresIn: '1h' });
@@ -268,7 +272,80 @@ router.post('/forgot-password', async (req, res) => {
     return res.status(500).json({ message: 'Internal server error' });
   }
 });
+////////////////////////////////ban a user and send an email////////////
+router.get('/ban/:id', async (req, res) => {
+  const userId = req.params.id;
 
+  try {
+    // Find user by ID
+    const user = await User.findOne({ _id: userId });
+
+    // If user not found, return error response
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    if (user.isBanned==true){
+      return res.status(404).json({message: 'user is already banned'})
+    }
+    // Set ban status to true and add reason
+    user.isBanned = true;
+
+    // Save updated user to database
+    await user.save();
+
+    // Send ban email
+    const mailOptions = {
+      from: 'hkyosri@gmail.com',
+      to: user.email,
+      subject: 'Your account has been banned',
+      text: `Your account has been banned for more informations you need to contact us.`
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.json({ message: 'User banned' });
+  } catch (err) {
+    console.error('Error banning user', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+////////////////unban a user////////////////////////////////////////////////
+router.get('/unban/:id', async (req, res) => {
+  const userId = req.params.id;
+
+  try {
+    // Find user by ID
+    const user = await User.findOne({ _id: userId });
+
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    if (user.isBanned==false){
+      return res.status(404).json({message: 'the user is not banned'})
+    }
+    
+    user.isBanned = false;
+
+    // Save updated user to database
+    await user.save();
+
+    // Send unban email
+    const mailOptions = {
+      from: 'hkyosri@gmail.com',
+      to: user.email,
+      subject: 'Your account has been banned',
+      text: `your account is now unbanned`
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.json({ message: 'User unbanned' });
+  } catch (err) {
+    console.error('Error unbanning user', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 
 

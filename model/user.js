@@ -36,7 +36,12 @@ var User = new Schema({
         type: Boolean,
         default: false,
       },
-      verificationToken: {type:String},
+      verificationToken: 
+        {type:String},
+      isBanned: {
+        type:Boolean,
+        default:false
+      }
 
 
       
