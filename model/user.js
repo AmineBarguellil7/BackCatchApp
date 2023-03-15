@@ -41,6 +41,9 @@ var User = new Schema({
       isBanned: {
         type:Boolean,
         default:false
+      },
+      profilePic:{
+        type:String
       }
 
 
