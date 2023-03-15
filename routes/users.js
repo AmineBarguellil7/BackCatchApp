@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
 });
 
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/' }); // define upload directory
+const upload = multer({ dest: 'C:/Users/LENOVO/Desktop/pi frontend/CatchApp_The_Innovators/public/img' }); // define upload directory
 
 router.post('/signup', upload.single('profilePic'), async (req, res) => {
   const { fname, lname, birthdate, phone, email, password } = req.body;
@@ -56,7 +56,7 @@ router.post('/signup', upload.single('profilePic'), async (req, res) => {
       from: 'hkyosri@gmail.com',
       to: user.email,
       subject: 'Verify your email address',
-      text: `Please click on this link to verify your email address: http://localhost:3000/users/verify-email/${user.verificationToken}`
+      text: `Please click on this link to verify your email address: http://localhost:3001/users/verify-email/${user.verificationToken}`
     };
 
     await transporter.sendMail(mailOptions);
