@@ -143,6 +143,37 @@ router.put('/update/:id', verifyToken, async (req, res) => {
 
 
 
+router.put('/updateUser/:id', async (req, res) => {
+  const { fname, lname, birthdate, phone } = req.body;
+  const userId = req.params.id;
+
+  try {
+    // Find user by ID
+    const user = await User.findOne({ _id: userId });
+
+    // If user not found, return error response
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Update user details
+    user.fname = fname || user.fname;
+    user.lname = lname || user.lname;
+    user.birthdate = birthdate || user.birthdate;
+    user.phone = phone || user.phone;
+
+    // Save updated user to database
+    await user.save();
+
+    res.json({ message: 'User updated' });
+  } catch (err) {
+    console.error('Error updating user', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
+
 router.put('/updateAdmin/:id', async (req, res) => {
   const { fname, lname, birthdate, phone } = req.body;
   const userId = req.params.id;
