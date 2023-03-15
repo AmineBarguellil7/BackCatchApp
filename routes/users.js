@@ -7,6 +7,21 @@ const User = require('../model/user');
 const crypto = require('crypto');
 
 const secretKey = process.env.JWT_SECRET_KEY || 'mysecretkey';
+////////////////////////////import profile pic/////////////////
+const multer = require('multer');
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './uploads');
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + '.' + file.originalname.split('.').pop());
+  }
+});
+
+const upload = multer({ storage: storage });
+
 /* GET users listing. */
 router.get('/', async (req, res) => {
   try {
@@ -40,7 +55,7 @@ router.post('/signup', async (req, res) => {
     email,
     password: hashedPassword,
     verificationToken: crypto.randomBytes(20).toString('hex'),
-    
+    profilePic: req.file.filename,
   });
 
   try {
@@ -134,7 +149,10 @@ router.put('/update/:id', verifyToken, async (req, res) => {
     user.lname = lname || user.lname;
     user.birthdate = birthdate || user.birthdate;
     user.phone = phone || user.phone;
-
+// If a new profile picture is uploaded, update the user's profile picture
+if (req.file) {
+  user.profilePic = req.file.path;
+}
     // Save updated user to database
     await user.save();
 
