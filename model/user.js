@@ -42,10 +42,9 @@ var User = new Schema({
         type:Boolean,
         default:false
       },
-      profilePic:{
-        type:String
+      profilePic: {
+        type: String
       }
-
 
       
 });
