@@ -13,6 +13,7 @@ var User = new Schema({
       },
       birthdate: {
         type: Date,
+        required: true,
       },
       phone: {
         type: Number,
@@ -31,7 +32,16 @@ var User = new Schema({
         type: Boolean,
         default: false,
       },
-      
+      isActivated: {
+        type: Boolean,
+        default: false,
+      },
+      verificationToken: 
+        {type:String},
+      isBanned: {
+        type:Boolean,
+        default:false
+      }
 });
 
 module.exports = mongoose.model('users', User);
