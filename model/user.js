@@ -5,28 +5,28 @@ var User = new Schema({
 
     fname: {
         type: String,
-        required: true,
+        
       },
       lname: {
         type: String,
-        required: true,
+
       },
       birthdate: {
         type: Date,
-        required: true,
+       
       },
       phone: {
         type: Number,
-        required: true,
+       
       },
       email: {
         type: String,
-        required: true,
+        
         unique: true,
       },
       password: {
-        type: String,
-        required: true,
+        type: String
+       
       },
       isAdmin: {
         type: Boolean,
@@ -41,7 +41,14 @@ var User = new Schema({
       isBanned: {
         type:Boolean,
         default:false
-      }
+      },
+      profilePic: {
+        type: String
+      },
+      provider:{
+        type: String,
+        default:"none"
+      }  
 });
 
 module.exports = mongoose.model('users', User);

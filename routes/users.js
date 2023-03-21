@@ -21,8 +21,17 @@ router.get('/', async (req, res) => {
 });
 
 /////////////////////////////////////////////////////////////////////////////////////signup////////////////
-router.post('/signup', async (req, res) => {
+const multer = require('multer');
+const upload = multer({ dest: 'C:/Users/Amine Barguellil/Desktop/projet pi/Amine/CatchApp_The_Innovators/public/img' }); // define upload directory
+
+router.post('/signup', upload.single('profilePic'), async (req, res) => {
   const { fname, lname, birthdate, phone, email, password } = req.body;
+  const characters =
+    "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let randomCode = "";
+  for (let i = 0; i < 25; i++) {
+    randomCode += characters[Math.floor(Math.random() * characters.length)];
+  }
   // Hash the password
   const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -35,12 +44,12 @@ router.post('/signup', async (req, res) => {
     email,
     password: hashedPassword,
     verificationToken: crypto.randomBytes(20).toString('hex'),
+    profilePic: req.file ? req.file.filename : undefined,
   });
 
   try {
     // Save the user to the database
     await user.save();
-    console.log(user);
 
     // Send verification email
     const mailOptions = {
@@ -51,9 +60,8 @@ router.post('/signup', async (req, res) => {
     };
 
     await transporter.sendMail(mailOptions);
-    
 
-    res.status(201).json({ message: 'User created'});
+    res.status(201).json({ message: 'User created' });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
@@ -202,6 +210,57 @@ router.put('/updateAdmin/:id', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+
+/////////////////////////////////////////////////
+
+router.put('/updateProvider/:id', async (req, res) => {
+  const userId = req.params.id;
+  try { 
+    // Find user by ID
+    const user = await User.findOne({ _id: userId });
+
+    // If user not found, return error response
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    user.provider="Google"
+    await user.save();
+
+    res.json({ message: 'User updated' });
+  }
+  catch (err) {
+    console.error('Error updating user', err);
+  }
+});
+
+
+router.put('/updateFacebookProvider/:id', async (req, res) => {
+  const userId = req.params.id;
+  try { 
+    // Find user by ID
+    const user = await User.findOne({ _id: userId });
+
+    // If user not found, return error response
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    user.provider="Facebook"
+    await user.save();
+
+    res.json({ message: 'User updated' });
+  }
+  catch (err) {
+    console.error('Error updating user', err);
+  }
+});
+
+
+
+
+/////////////////////////////////////////////////
 
 
 
