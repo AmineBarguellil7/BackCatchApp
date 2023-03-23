@@ -14,6 +14,7 @@ const cors = require('cors')
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var facebookRouter = require('./routes/facebook');
+var clubsRouter=require('./routes/clubs');
 
 var mongoose = require('mongoose');
 var config = require('./database/mongodb');
@@ -34,6 +35,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/clubs',clubsRouter);
 app.use('/auth/facebook', facebookRouter);
 
 // catch 404 and forward to error handler
