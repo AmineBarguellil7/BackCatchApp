@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const Club=require('../model/club');
-
+const User=require('../model/user')
 
 
 router.get('/', async (req, res) => {
@@ -76,19 +76,60 @@ router.delete('/delete/:id', async (req, res) => {
   });
 
 
-router.put('/:clubId/:userId/join', async (req, res) => {
+  router.get('/:clubId/:userId/join', async (req, res) => {
     try {
-      const club = await Club.findByIdAndUpdate(req.params.clubId, {
-        $addToSet: { members: req.params.userId }
-      }, { new: true });
+      const user = await User.findByIdAndUpdate(
+        req.params.userId,
+        { $addToSet: { clubs: req.params.clubId } },
+        { new: true }
+      );
+      if (!user) {
+        return res.status(404).send({ error: 'User not found' });
+      }
+  
+      const club = await Club.findByIdAndUpdate(
+        req.params.clubId,
+        { $addToSet: { members: req.params.userId } },
+        { new: true }
+      );
       if (!club) {
         return res.status(404).send({ error: 'Club not found' });
       }
-      res.send(club);
+  
+      res.send({club, user});
     } catch (error) {
+      console.error(error);
       res.status(500).send({ error: 'Internal server error' });
     }
-  });  
+  });
+  router.delete('/:clubId/:userId/leave', async (req, res) => {
+    try {
+      const user = await User.findByIdAndUpdate(
+        req.params.userId,
+        { $pull: { clubs: req.params.clubId } },
+        { new: true }
+      );
+      if (!user) {
+        return res.status(404).send({ error: 'User not found' });
+      }
+  
+      const club = await Club.findByIdAndUpdate(
+        req.params.clubId,
+        { $pull: { members: req.params.userId } },
+        { new: true }
+      );
+      if (!club) {
+        return res.status(404).send({ error: 'Club not found' });
+      }
+  
+      res.send({club, user});
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error: 'Internal server error' });
+    }
+  });
+  
+
    
   
 

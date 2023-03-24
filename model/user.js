@@ -48,7 +48,20 @@ var User = new Schema({
       provider:{
         type: String,
         default:"none"
-      }  
+      }  ,
+      clubs: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'clubs',
+        paid: {
+          type: Boolean,
+          default: false
+        },
+        expirationDate: {
+          type: Date,
+          required: true,
+        },
+      }],
+
 });
 
 module.exports = mongoose.model('users', User);

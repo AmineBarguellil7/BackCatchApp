@@ -17,9 +17,21 @@ var Club=new Schema({
     logo: {
       type: String,
     },
+    domaine:{
+      type:String,
+      required:true,
+    },
     members: [{
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'users'
+      ref: 'users',
+      paid: {
+        type: Boolean,
+        default: false
+      },
+      expirationDate: {
+        type: Date,
+        required: true,
+      },
     }],
     events: [{
       type: mongoose.Schema.Types.ObjectId,

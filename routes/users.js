@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
 
 /////////////////////////////////////////////////////////////////////////////////////signup////////////////
 const multer = require('multer');
-const upload = multer({ dest: 'C:/Users/Amine Barguellil/Desktop/projet pi/Amine/CatchApp_The_Innovators/public/img' }); // define upload directory
+const upload = multer({ dest: 'img' }); // define upload directory
 
 router.post('/signup', upload.single('profilePic'), async (req, res) => {
   const { fname, lname, birthdate, phone, email, password } = req.body;
