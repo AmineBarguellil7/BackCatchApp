@@ -468,7 +468,30 @@ router.get('/unban/:id', async (req, res) => {
   }
 });
 
+const Event = require('../model/event');
 
+// Join an event
+router.post('/:id/join', async (req, res) => {
+  try {
+    const event = await Event.findById(req.params.id);
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+    // Check if user is already attending the event
+    if (event.attendees.includes(req.user._id)) {
+      return res.status(400).json({ message: 'User is already attending this event' });
+    }
+    // Check if there are available places in the event
+    if (event.numPlaces <= event.attendees.length) {
+      return res.status(400).json({ message: 'This event is full' });
+    }
+    event.attendees.push(req.user._id);
+    await event.save();
+    res.status(200).json(event);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
 
 
 

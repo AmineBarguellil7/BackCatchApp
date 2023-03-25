@@ -7,20 +7,20 @@ var User = new Schema({
         type: String,
         
       },
-      lname: {
+    lname: {
         type: String,
 
       },
-      birthdate: {
+    birthdate: {
         type: Date,
        
       },
-      phone: {
+    phone: {
         type: Number,
        
       },
-      email: {
-        type: String,
+    email: {
+      type: String,
         
         unique: true,
       },
@@ -60,7 +60,21 @@ var User = new Schema({
           type: Date,
           required: true,
         },
+
       }],
+      events: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'events',
+        paid: {
+          type: Boolean,
+          default: false
+        },
+        
+
+      }],
+
+
+    
 
 });
 

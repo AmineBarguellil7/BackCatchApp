@@ -3,7 +3,7 @@ var router = express.Router();
 const Club=require('../model/club');
 const User=require('../model/user')
 
-
+////////////get list clubs/////////////
 router.get('/', async (req, res) => {
     try {
       const clubs = await Club.find().populate('members');
@@ -14,7 +14,7 @@ router.get('/', async (req, res) => {
     }
   });
 
-
+//////////////add club///////////////
 router.post('/add', async (req, res) => {
     try {
       const club = new Club(req.body);
@@ -26,7 +26,7 @@ router.post('/add', async (req, res) => {
   }); 
   
   
-
+////////////////get by id ////////////
 router.get('/:id', async (req, res) => {
     try {
       const club = await Club.findById(req.params.id);
@@ -40,7 +40,7 @@ router.get('/:id', async (req, res) => {
   });  
   
 
-
+///////////////////update club//////////
 router.put('/update/:id', async (req, res) => {
     // const updates = Object.keys(req.body);
     // const allowedUpdates = ['name', 'description', 'members'];
@@ -62,7 +62,7 @@ router.put('/update/:id', async (req, res) => {
   });  
 
 
-
+/////////////delete club/////////////
 router.delete('/delete/:id', async (req, res) => {
     try {
       const club = await Club.findByIdAndDelete(req.params.id);
@@ -75,6 +75,7 @@ router.delete('/delete/:id', async (req, res) => {
     }
   });
 
+  /////////////////user join a club////////////
 
   router.get('/:clubId/:userId/join', async (req, res) => {
     try {
@@ -102,6 +103,7 @@ router.delete('/delete/:id', async (req, res) => {
       res.status(500).send({ error: 'Internal server error' });
     }
   });
+  ///////////////delete a user from a club///////////////
   router.delete('/:clubId/:userId/leave', async (req, res) => {
     try {
       const user = await User.findByIdAndUpdate(
@@ -128,7 +130,7 @@ router.delete('/delete/:id', async (req, res) => {
       res.status(500).send({ error: 'Internal server error' });
     }
   });
-  
+
 
    
   
