@@ -23,15 +23,7 @@ var Club=new Schema({
     },
     members: [{
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'users',
-      paid: {
-        type: Boolean,
-        default: false
-      },
-      expirationDate: {
-        type: Date,
-        required: true,
-      },
+      ref: 'users'
     }],
     events: [{
       type: mongoose.Schema.Types.ObjectId,
