@@ -15,7 +15,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var facebookRouter = require('./routes/facebook');
 var clubsRouter=require('./routes/clubs');
-
+var chatroomRouter=require('./routes/chatrooms');
 var mongoose = require('mongoose');
 var config = require('./database/mongodb');
 mongoose.connect(config.mongo.uri);
@@ -35,6 +35,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/events',eventRouter);
 app.use('/users', usersRouter);
 app.use('/clubs',clubsRouter);
+app.use('/chatrooms',chatroomRouter);
 app.use('/auth/facebook', facebookRouter);
 app.use('/', indexRouter);
 

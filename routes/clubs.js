@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 const Club=require('../model/club');
 const User=require('../model/user');
+const ChatRoom=require('../model/chatroom');
 
 ////////////get list clubs/////////////
 router.get('/', async (req, res) => {
@@ -16,14 +17,23 @@ router.get('/', async (req, res) => {
 
 //////////////add club///////////////
 router.post('/add', async (req, res) => {
-    try {
-      const club = new Club(req.body);
-      await club.save();
-      res.status(201).send(club);
-    } catch (error) {
-      res.status(400).send(error);
-    }
-  }); 
+  try {
+    const club = new Club(req.body);
+    await club.save();
+
+    // Create a chat room for the club
+    const chatRoom = new ChatRoom({
+      name: `${club.name} Chat Room`,
+      members: club.members,
+      club: club._id
+    });
+    await chatRoom.save();
+
+    res.status(201).send(club);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
   
   
 ////////////////get by id ////////////
