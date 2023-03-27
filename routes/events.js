@@ -1,26 +1,19 @@
 var express = require('express');
 var router = express.Router();
-const event=require('../model/event');
-
+const Event=require('../model/event');
+const mongoose = require('mongoose');
+const User = require('../model/user');
+const Club = require('../model/club');
 // Create a new event
-router.post('/', async (req, res) => {
-    try {
-      const event = new Event({
-        title: req.body.title,
-        description: req.body.description,
-        date: req.body.date,
-        location: req.body.location,
-        fee: req.body.fee,
-        numPlaces: req.body.numPlaces,
-        organizer: req.body.organizer,
-        attendees: []
-      });
-      const newEvent = await event.save();
-      res.status(201).json(newEvent);
-    } catch (err) {
-      res.status(400).json({ message: err.message });
-    }
-  });
+router.post('/add', async (req, res) => {
+  try {
+    const event = new Event(req.body);
+      await event.save();
+      res.status(201).send(event);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
   // Update an existing event
 router.put('/:id', async (req, res) => {
     try {
@@ -67,6 +60,42 @@ router.get('/coming', async (req, res) => {
       res.status(500).json({ message: err.message });
     }
   });
+//join an event
+  router.post('/:clubId/:eventId/join/:userId', async (req, res) => {
+    try {
+      const club = await Club.findById(req.params.clubId);
+      if (!club) {
+        return res.status(404).json({ message: 'Club not found' });
+      }
+      const user = await User.findById(req.params.userId);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      if (!club.members.includes(user._id)) {
+        return res.status(400).json({ message: 'User is not a member of this club' });
+      }
+      const event = await Event.findById(req.params.eventId);
+      if (!event) {
+        return res.status(404).json({ message: 'Event not found' });
+      }
+      if (event.attendees.includes(req.params.userId)) {
+        return res.status(400).json({ message: 'User is already attending this event' });
+      }
+      if (event.numPlaces <= event.attendees.length) {
+        return res.status(400).json({ message: 'This event is full' });
+      }
+      event.attendees.push(req.params.userId);
+      await event.save();
+      user.events.push(req.params.eventId);
+      await user.save();
+      res.status(200).json(event);
+    } catch (err) {
+      res.status(400).json({ message: err.message });
+    }
+  });
+  
+
+
 
   
 

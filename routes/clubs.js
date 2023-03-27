@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const Club=require('../model/club');
-const User=require('../model/user')
+const User=require('../model/user');
 
 ////////////get list clubs/////////////
 router.get('/', async (req, res) => {
