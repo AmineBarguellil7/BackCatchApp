@@ -17,6 +17,7 @@ var Club=new Schema({
     logo: {
       type: String,
     },
+    domain: { type: String},
     members: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: 'users'

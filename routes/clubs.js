@@ -14,10 +14,17 @@ router.get('/', async (req, res) => {
     }
   });
 
-
-router.post('/add', async (req, res) => {
+  const multer = require('multer');
+  const upload = multer({ dest: 'C:/Users/Amine Barguellil/Desktop/projet pi/Amine/CatchApp_The_Innovators/public/img' }); // define upload directory
+router.post('/add',upload.single('logo'), async (req, res) => {
+  const { name, description,address } = req.body;
     try {
-      const club = new Club(req.body);
+      const club = new Club({
+        name,
+        description,
+        address,
+        logo: req.file ? req.file.filename : undefined,
+      });
       await club.save();
       res.status(201).send(club);
     } catch (error) {
@@ -41,22 +48,27 @@ router.get('/:id', async (req, res) => {
   
 
 
-router.put('/update/:id', async (req, res) => {
-    // const updates = Object.keys(req.body);
-    // const allowedUpdates = ['name', 'description', 'members'];
-    // const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
-  
-    // if (!isValidOperation) {
-    //   return res.status(400).send({ error: 'Invalid updates!' });
-    // }
-    // { new: true, runValidators: true } in the await Club.findByIdAndUpdate(req.params.id, req.body) after req.body
+router.put('/update/:id',upload.single('logo'), async (req, res) => {
+  const { name,description,address } = req.body;
+  const ClubId = req.params.id;
     try {
-      const club = await Club.findByIdAndUpdate(req.params.id, req.body,{ new: true });
+      const club = await Club.findOne({ _id: ClubId });
       if (!club) {
         return res.status(404).send();
       }
+      club.name = name || club.name;
+      club.description = description || club.description;
+      club.address = address || club.address;
+      if (req.file) {
+        club.logo =req.file.filename;
+      }
+      else {
+        club.logo=undefined;
+      }
+      await club.save()
       res.send(club);
     } catch (error) {
+      console.log(error.message)
       res.status(400).send(error);
     }
   });  
