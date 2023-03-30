@@ -7,20 +7,20 @@ var User = new Schema({
         type: String,
         
       },
-      lname: {
+    lname: {
         type: String,
 
       },
-      birthdate: {
+    birthdate: {
         type: Date,
        
       },
-      phone: {
+    phone: {
         type: Number,
        
       },
-      email: {
-        type: String,
+    email: {
+      type: String,
         
         unique: true,
       },
@@ -48,7 +48,25 @@ var User = new Schema({
       provider:{
         type: String,
         default:"none"
-      }  
+      }  ,
+      clubs: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'clubs'
+      }],
+      events: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'events',
+        paid: {
+          type: Boolean,
+          default: false
+        },
+        
+
+      }],
+
+
+    
+
 });
 
 module.exports = mongoose.model('users', User);
