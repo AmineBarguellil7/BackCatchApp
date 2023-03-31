@@ -10,7 +10,7 @@ const cors = require('cors')
 
 
 
-
+var eventRouter = require('./routes/events');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var facebookRouter = require('./routes/facebook');
@@ -39,6 +39,7 @@ app.use('/users', usersRouter);
 app.use('/clubs',clubsRouter);
 app.use('/auth/facebook', facebookRouter);
 app.use('/api', paymentRouter);
+app.use('/events',eventRouter);
 
 
 // catch 404 and forward to error handler
