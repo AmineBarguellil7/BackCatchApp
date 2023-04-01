@@ -27,13 +27,13 @@ const Event = new Schema({
   },
   organizer: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Club',
+    ref: 'clubs',
     required:true
   },
   attendees: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User'
+      ref: 'users'
     }
   ]
 });

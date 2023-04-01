@@ -15,6 +15,18 @@ router.get('/', async (req, res) => {
 });
 
 
+router.get('/:id', async (req, res) => {
+  const EventId=req.params.id;
+  try {
+    const event = await Event.findById(EventId);
+    res.json(event);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send('Erreur serveur');
+  }
+});
+
+
 
 // Create a new event
 router.post('/add', async (req, res) => {
@@ -60,6 +72,27 @@ router.get('/coming', async (req, res) => {
       res.status(400).json({ message: err.message });
     }
   });
+
+
+
+  router.get('/:id/attendees', async (req, res) => {
+    try {
+      const event = await Event.findById(req.params.id).populate('attendees');
+      if (!event) {
+        return res.status(404).json({ message: 'Event not found' });
+      }
+      res.json(event.attendees);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  });
+
+
+
+
+
+
+
   //////////number of attendees
   router.get('/:id/attendees/count', async (req, res) => {
     try {

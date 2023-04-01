@@ -24,7 +24,7 @@ var Club=new Schema({
     }],
     events: [{
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Event'
+      ref: 'events'
     }],
     statistics: {
       membersCount: {
