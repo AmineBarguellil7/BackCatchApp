@@ -28,10 +28,24 @@ router.get('/:id', async (req, res) => {
 
 
 
+const multer = require('multer');
+const event = require('../model/event');
+const upload = multer({ dest: 'C:/Users/Amine Barguellil/Desktop/projet pi/Amine/CatchApp_The_Innovators/public/img' }); // define upload directory
+
 // Create a new event
-router.post('/add', async (req, res) => {
+router.post('/add',upload.single('img') ,async (req, res) => {
+  const { title, description,date,location,fee,numPlaces,organizer } = req.body;
   try {
-    const event = new Event(req.body);
+    const event = new Event({
+      title,
+      description,
+      date,
+      location,
+      fee,
+      numPlaces,
+      organizer,
+      img: req.file ? req.file.filename : undefined,
+    });
       await event.save();
       res.status(201).send(event);
   } catch (err) {
@@ -39,12 +53,27 @@ router.post('/add', async (req, res) => {
   }
 });
   // Update an existing event
-router.put('/:id', async (req, res) => {
+router.put('/:id',upload.single('img'), async (req, res) => {
+  const { title, description,date,location,fee,numPlaces,organizer } = req.body;
     try {
-      const updatedEvent = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true });
+      const updatedEvent = await Event.findOne({ _id: req.params.id });
       if (!updatedEvent) {
         return res.status(404).json({ message: 'Event not found' });
       }
+      updatedEvent.title = title || updatedEvent.title;
+      updatedEvent.description = description || updatedEvent.description;
+      updatedEvent.date = date || updatedEvent.date;
+      updatedEvent.location = location || updatedEvent.location;
+      updatedEvent.fee = fee || updatedEvent.fee;
+      updatedEvent.numPlaces = numPlaces || updatedEvent.numPlaces;
+      updatedEvent.organizer=organizer || updatedEvent.organizer;
+      if (req.file) {
+        updatedEvent.img =req.file.filename;
+      }
+      else {
+        updatedEvent.img=undefined;
+      }
+      await updatedEvent.save()
       res.status(200).json(updatedEvent);
     } catch (err) {
       res.status(400).json({ message: err.message });
@@ -106,19 +135,19 @@ router.get('/coming', async (req, res) => {
     }
   });
 //join an event
-  router.post('/:clubId/:eventId/join/:userId', async (req, res) => {
+  router.post('/:eventId/join/:userId', async (req, res) => {
     try {
-      const club = await Club.findById(req.params.clubId);
-      if (!club) {
-        return res.status(404).json({ message: 'Club not found' });
-      }
+      // const club = await Club.findById(req.params.clubId);
+      // if (!club) {
+      //   return res.status(404).json({ message: 'Club not found' });
+      // }
       const user = await User.findById(req.params.userId);
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
-      if (!club.members.includes(user._id)) {
-        return res.status(400).json({ message: 'User is not a member of this club' });
-      }
+      // if (!club.members.includes(user._id)) {
+      //   return res.status(400).json({ message: 'User is not a member of this club' });
+      // }
       const event = await Event.findById(req.params.eventId);
       if (!event) {
         return res.status(404).json({ message: 'Event not found' });

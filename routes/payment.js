@@ -14,7 +14,7 @@ const createPayment = async (req, res) => {
     app_secret: '2e53661b-14dc-4c90-8586-f52c2bd30ad9',
     accept_card: true,
     amount: 5000,
-    success_link: `http://localhost:3001/success/${req.params.clubId}/${req.params.userId}`,
+    success_link: `http://localhost:3000/ValidatePayment`,
     fail_link: `http://localhost:3001/fail/${req.params.clubId}/${req.params.userId}`,
     session_timeout_secs: 1200, 
     developer_tracking_id: '4422763e-4df5-4f25-aa17-0ee7541ccc76'

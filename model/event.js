@@ -30,12 +30,16 @@ const Event = new Schema({
     ref: 'clubs',
     required:true
   },
+  img:{
+    type:String,
+    required:true
+  },
   attendees: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'users'
     }
-  ]
+  ],
 });
 
 module.exports = mongoose.model('events', Event);

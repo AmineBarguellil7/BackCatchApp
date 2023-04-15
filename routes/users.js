@@ -468,6 +468,22 @@ router.get('/unban/:id', async (req, res) => {
 });
 
 
+router.get('/:id/events', async (req, res) => {
+  const Id = req.params.id;
+  try {
+    const user = await User.findById(Id).populate('events');
+    if (!user) {
+      res.status(404).send({ "message": "User not found" });
+      return;
+    }
+    res.json(user.events);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    res.status(500).send({ "message": "Erreur serveur" });
+  }
+});
+
+
 
 
 
