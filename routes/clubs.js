@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 const Club=require('../model/club');
 const User = require('../model/user');
+const Event=require("../model/event");
 const ChatRoom=require('../model/chatroom');
 
 
@@ -19,12 +20,13 @@ router.get('/', async (req, res) => {
   const multer = require('multer');
   const upload = multer({ dest: 'C:/Users/Amine Barguellil/Desktop/projet pi/Amine/CatchApp_The_Innovators/public/img' }); // define upload directory
 router.post('/add',upload.single('logo'), async (req, res) => {
-  const { name, description,address } = req.body;
+  const { name, description,address,domain } = req.body;
     try {
       const club = new Club({
         name,
         description,
         address,
+        domain,
         logo: req.file ? req.file.filename : undefined,
       });
       await club.save();
@@ -62,7 +64,7 @@ router.get('/:id', async (req, res) => {
 
 
 router.put('/update/:id',upload.single('logo'), async (req, res) => {
-  const { name,description,address } = req.body;
+  const { name,description,address,domain } = req.body;
   const ClubId = req.params.id;
     try {
       const club = await Club.findOne({ _id: ClubId });
@@ -72,6 +74,7 @@ router.put('/update/:id',upload.single('logo'), async (req, res) => {
       club.name = name || club.name;
       club.description = description || club.description;
       club.address = address || club.address;
+      club.domain = domain || club.domain;
       if (req.file) {
         club.logo =req.file.filename;
       }
@@ -90,10 +93,26 @@ router.put('/update/:id',upload.single('logo'), async (req, res) => {
 
 router.delete('/delete/:id', async (req, res) => {
     try {
-      const club = await Club.findByIdAndDelete(req.params.id);
+      const club = await Club.findOne({_id:req.params.id});
       if (!club) {
         return res.status(404).send();
       }
+      await User.updateMany(
+        { _id: { $in: club.members } }, 
+        { $pull: { clubs: club._id } } 
+      );
+      await User.updateMany(
+        { events: { $in: club.events } }, 
+        { $pull: { events: { $in: club.events } } } 
+      );      
+      club.events.forEach(async (eventId) => {
+        await Club.updateMany(
+          { events: eventId },
+          { $pull: { events: eventId } }
+        );
+        await Event.findOneAndDelete({ _id: eventId });
+      });
+      club.deleteOne();
       res.send(club);
     } catch (error) {
       res.status(500).send();

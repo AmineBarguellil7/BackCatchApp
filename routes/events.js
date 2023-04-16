@@ -29,7 +29,6 @@ router.get('/:id', async (req, res) => {
 
 
 const multer = require('multer');
-const event = require('../model/event');
 const upload = multer({ dest: 'C:/Users/Amine Barguellil/Desktop/projet pi/Amine/CatchApp_The_Innovators/public/img' }); // define upload directory
 
 // Create a new event
@@ -47,6 +46,10 @@ router.post('/add',upload.single('img') ,async (req, res) => {
       img: req.file ? req.file.filename : undefined,
     });
       await event.save();
+      await Club.updateOne(
+        { _id: organizer },
+        { $push: { events: event._id } } 
+      );
       res.status(201).send(event);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -60,6 +63,10 @@ router.put('/:id',upload.single('img'), async (req, res) => {
       if (!updatedEvent) {
         return res.status(404).json({ message: 'Event not found' });
       }
+      await Club.updateOne(
+        { _id: updatedEvent.organizer },
+        { $pull: { events: updatedEvent._id } } // Add the event ID to the events array of the club
+      );
       updatedEvent.title = title || updatedEvent.title;
       updatedEvent.description = description || updatedEvent.description;
       updatedEvent.date = date || updatedEvent.date;
@@ -74,6 +81,10 @@ router.put('/:id',upload.single('img'), async (req, res) => {
         updatedEvent.img=undefined;
       }
       await updatedEvent.save()
+      await Club.updateOne(
+        { _id: organizer },
+        { $push: { events: updatedEvent._id } } 
+      );
       res.status(200).json(updatedEvent);
     } catch (err) {
       res.status(400).json({ message: err.message });
@@ -82,16 +93,26 @@ router.put('/:id',upload.single('img'), async (req, res) => {
   
 // Delete an existing event
 router.delete('/:id', async (req, res) => {
-    try {
-      const deletedEvent = await Event.findByIdAndDelete(req.params.id);
-      if (!deletedEvent) {
-        return res.status(404).json({ message: 'Event not found' });
-      }
-      res.status(200).json({ message: 'Event deleted successfully' });
-    } catch (err) {
-      res.status(400).json({ message: err.message });
+  try {
+    const deletedEvent = await Event.findOne({_id:req.params.id});
+    if (!deletedEvent) {
+      return res.status(404).json({ message: 'Event not found' });
     }
-  });
+    await User.updateMany(
+      { _id: { $in: deletedEvent.attendees } }, 
+      { $pull: { events: deletedEvent._id } } 
+    );
+    await Club.updateOne(
+      { _id:deletedEvent.organizer },
+      { $pull: { events: deletedEvent._id } } // Add the event ID to the events array of the club
+    );
+    await deletedEvent.deleteOne(); // Update the method to deleteOne()
+    res.status(200).json({ message: 'Event deleted successfully' });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
   // Get all upcoming events ordered by date
 router.get('/coming', async (req, res) => {
     try {
@@ -165,6 +186,36 @@ router.get('/coming', async (req, res) => {
       res.status(200).json(event);
     } catch (err) {
       res.status(400).json({ message: err.message });
+    }
+  });
+
+
+  ////////////////////// Leave Event //////////////////
+
+  router.delete('/:eventId/:userId/leave', async (req, res) => {
+    try {
+      const user = await User.findByIdAndUpdate(
+        req.params.userId,
+        { $pull: { events: req.params.eventId } },
+        { new: true }
+      );
+      if (!user) {
+        return res.status(404).send({ error: 'User not found' });
+      }
+  
+      const event = await Event.findByIdAndUpdate(
+        req.params.eventId,
+        { $pull: { attendees: req.params.userId } },
+        { new: true }
+      );
+      if (!event) {
+        return res.status(404).send({ error: 'Event not found' });
+      }
+  
+      res.send({event, user});
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error: 'Internal server error' });
     }
   });
   
