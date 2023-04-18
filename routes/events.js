@@ -33,12 +33,13 @@ const upload = multer({ dest: 'C:/Users/Amine Barguellil/Desktop/projet pi/Amine
 
 // Create a new event
 router.post('/add',upload.single('img') ,async (req, res) => {
-  const { title, description,date,location,fee,numPlaces,organizer } = req.body;
+  const { title, description,start,end,location,fee,numPlaces,organizer } = req.body;
   try {
     const event = new Event({
       title,
       description,
-      date,
+      start,
+      end,
       location,
       fee,
       numPlaces,
@@ -57,7 +58,7 @@ router.post('/add',upload.single('img') ,async (req, res) => {
 });
   // Update an existing event
 router.put('/:id',upload.single('img'), async (req, res) => {
-  const { title, description,date,location,fee,numPlaces,organizer } = req.body;
+  const { title, description,start,end,location,fee,numPlaces,organizer } = req.body;
     try {
       const updatedEvent = await Event.findOne({ _id: req.params.id });
       if (!updatedEvent) {
@@ -69,7 +70,8 @@ router.put('/:id',upload.single('img'), async (req, res) => {
       );
       updatedEvent.title = title || updatedEvent.title;
       updatedEvent.description = description || updatedEvent.description;
-      updatedEvent.date = date || updatedEvent.date;
+      updatedEvent.start = start || updatedEvent.start;
+      updatedEvent.end = end || updatedEvent.end;
       updatedEvent.location = location || updatedEvent.location;
       updatedEvent.fee = fee || updatedEvent.fee;
       updatedEvent.numPlaces = numPlaces || updatedEvent.numPlaces;
