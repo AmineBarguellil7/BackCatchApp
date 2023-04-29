@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
   });
 
   const multer = require('multer');
-  const upload = multer({ dest: 'C:/Users/dhifa/OneDrive/Bureau/CatchApp_The_Innovators/public/img' }); // define upload directory
+  const upload = multer({ dest: 'C:/Users/Amine Barguellil/Desktop/projet pi/Ahmed/CatchApp_The_Innovators/public/img' }); // define upload directory
 router.post('/add',upload.single('logo'), async (req, res) => {
   const { name, description,address,domain } = req.body;
     try {
@@ -180,7 +180,45 @@ router.delete('/delete/:id', async (req, res) => {
     
    
   
+  router.put('/:userId/:clubId/like', async (req, res) => {
+    try {
+      const clubId = req.params.clubId;
+      const userId = req.params.userId; 
+      
+      let club = await Club.findById(clubId);
+        club = await Club.findByIdAndUpdate(
+          clubId,
+          { $inc: { likeCount: 1 }, $push: { likes: userId } },
+          { new: true }
+        );
+      res.json(club);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Erreur Serveur');
+    }
+  });
 
+
+
+
+router.put('/:userId/:clubId/dislike', async (req, res) => {
+    try {
+        const clubId = req.params.clubId;
+        const userId = req.params.userId; 
+        
+        let club = await Club.findById(clubId);
+        
+          club = await Club.findByIdAndUpdate(
+            clubId,
+            { $inc: { dislikeCount: +1 }, $push: { dislikes: userId } },
+            { new: true }
+        );
+        res.json(club);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Erreur Serveur');
+    }
+});
 
 
 
