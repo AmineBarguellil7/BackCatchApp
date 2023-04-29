@@ -16,7 +16,7 @@ var usersRouter = require('./routes/users');
 var facebookRouter = require('./routes/facebook');
 var clubsRouter=require('./routes/clubs');
 var paymentRouter=require('./routes/payment');
-
+var payEventRouter=require('./routes/PaymentEvent')
 var mongoose = require('mongoose');
 var config = require('./database/mongodb');
 mongoose.connect(config.mongo.uri);
@@ -40,7 +40,7 @@ app.use('/clubs',clubsRouter);
 app.use('/auth/facebook', facebookRouter);
 app.use('/api', paymentRouter);
 app.use('/events',eventRouter);
-
+app.use('/payevent',payEventRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

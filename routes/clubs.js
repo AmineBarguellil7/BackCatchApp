@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
   });
 
   const multer = require('multer');
-  const upload = multer({ dest: 'C:/Users/Amine Barguellil/Desktop/projet pi/Amine/CatchApp_The_Innovators/public/img' }); // define upload directory
+  const upload = multer({ dest: 'C:/Users/dhifa/OneDrive/Bureau/CatchApp_The_Innovators/public/img' }); // define upload directory
 router.post('/add',upload.single('logo'), async (req, res) => {
   const { name, description,address,domain } = req.body;
     try {

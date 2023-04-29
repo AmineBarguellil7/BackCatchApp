@@ -56,10 +56,7 @@ var User = new Schema({
       events: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'events',
-        paid: {
-          type: Boolean,
-          default: false
-        },
+
         
 
       }],
