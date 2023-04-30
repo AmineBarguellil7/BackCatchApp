@@ -19,9 +19,32 @@ router.get('/', async (req, res) => {
   }
 });
 
+//////////////////////////////search user
+router.get('/users', async (req, res) => {
+  try {
+    const keyword = req.query.search
+      ? {
+          $or: [
+            { fname: { $regex: req.query.search, $options: "i" } },
+            { lname: { $regex: req.query.search, $options: "i" } },
+            { email: { $regex: req.query.search, $options: "i" } },
+          ],
+        }
+      : {};
+
+    const users = await User.find(keyword).find();
+    res.send(users);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+});
+
+
+
 /////////////////////////////////////////////////////////////////////////////////////signup////////////////
 const multer = require('multer');
-const upload = multer({ dest: 'C:/Users/Amine Barguellil/Desktop/projet pi/Amine/CatchApp_The_Innovators/public/img' }); // define upload directory
+const upload = multer({ dest: '' }); // define upload directory
 
 router.post('/signup', upload.single('profilePic'), async (req, res) => {
   const { fname, lname, birthdate, phone, email, password } = req.body;
@@ -148,7 +171,7 @@ router.put('/update/:id', verifyToken, async (req, res) => {
   }
 });
 
-
+//////////////////////////////////////////////////////
 
 router.put('/updateUser/:id', async (req, res) => {
   const { fname, lname, birthdate, phone } = req.body;

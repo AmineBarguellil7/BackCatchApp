@@ -3,12 +3,12 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-const cors = require('cors')
+const cors =  require('cors')
+const {chats} =require('./data/data')
 
 
 
-
-
+var messageRoutes = require("./routes/messageRoutes");
 
 var eventRouter = require('./routes/events');
 var indexRouter = require('./routes/index');
@@ -16,9 +16,10 @@ var usersRouter = require('./routes/users');
 var facebookRouter = require('./routes/facebook');
 var clubsRouter=require('./routes/clubs');
 var paymentRouter=require('./routes/payment');
-
+var chatRouter = require('./routes/chatRoutes');
 var mongoose = require('mongoose');
 var config = require('./database/mongodb');
+
 mongoose.connect(config.mongo.uri);
 
 var app = express();
@@ -40,7 +41,17 @@ app.use('/clubs',clubsRouter);
 app.use('/auth/facebook', facebookRouter);
 app.use('/api', paymentRouter);
 app.use('/events',eventRouter);
+app.use('/chat',chatRouter);
 
+  
+app.use("/message", messageRoutes);
+
+
+app.get('/api/chat/:id', (req,res)=> {
+  const singleChat = chats.find((c) => c._id === req.params.id);
+  
+res.send(singleChat);
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
