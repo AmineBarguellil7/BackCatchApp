@@ -59,7 +59,23 @@ var Club=new Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Comment'
     }],
-    created_at: { type: Date, default: Date.now }
+    created_at: { type: Date, default: Date.now },
+    likes: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'users'
+    }],
+    likeCount: {
+      type: Number,
+      default: 0
+    },
+    dislikeCount: {
+      type: Number,
+      default: 0
+    },
+    dislikes: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'users'
+    }]   
   });
 
 

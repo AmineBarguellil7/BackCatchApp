@@ -42,17 +42,8 @@ app.use('/auth/facebook', facebookRouter);
 app.use('/api', paymentRouter);
 app.use('/events',eventRouter);
 app.use('/chat',chatRouter);
-
-  
 app.use("/message", messageRoutes);
-
-
-app.get('/api/chat/:id', (req,res)=> {
-  const singleChat = chats.find((c) => c._id === req.params.id);
-  
-res.send(singleChat);
-});
-
+app.use('/payevent',payEventRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
