@@ -17,8 +17,13 @@ const {
 } = require("../controllers/messageControllers");
 
 const router = express.Router();
-
+/////////////////affiche lmsget l9dom "lfonction fl controller"///////
 router.route("/:chatId").get(allMessages);
+
+
+
+
+///////////////tb3ath msg//////////
 router.post("/:id", async (req, res) => {
     const { content, chatId } = req.body;
     const Id = req.params.id;

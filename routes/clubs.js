@@ -5,6 +5,9 @@ const User = require('../model/user');
 const Event=require("../model/event");
 const ChatRoom=require('../model/chatroom');
 
+const Message = require("../model/messageModel");
+
+const Chat = require("../model/chatModel");
 
 
 router.get('/', async (req, res) => {
@@ -19,7 +22,7 @@ router.get('/', async (req, res) => {
 
   const multer = require('multer');
   const upload = multer({ dest: '' }); // define upload directory
-router.post('/add',upload.single('logo'), async (req, res) => {
+router.post('/7add',upload.single('logo'), async (req, res) => {
   const { name, description,address,domain } = req.body;
     try {
       const club = new Club({
@@ -33,12 +36,7 @@ router.post('/add',upload.single('logo'), async (req, res) => {
 
 
       // Create a chat room for the club
-    const chatRoom = new ChatRoom({
-      name: `${club.name} Chat Room`,
-      members: club.members,
-      club: club._id
-    });
-    await chatRoom.save();
+
 
 
       res.status(201).send(club);
@@ -47,7 +45,52 @@ router.post('/add',upload.single('logo'), async (req, res) => {
     }
   }); 
   
+  router.post('/add', upload.single('logo'), async (req, res) => {
+    const { name, description, address, domain } = req.body;
+     // assuming you have implemented user authentication
   
+    try {
+      const existingClub = await Club.findOne({ name });
+      if (existingClub) {
+        return res.status(400).json({ message: 'A club with the same name already exists' });
+      }
+  
+      const club = new Club({
+        name,
+        description,
+        address,
+        domain,
+        logo: req.file ? req.file.filename : undefined,
+      });
+      await club.save();
+  
+      const chatName = `${req.body.name} Chat`;
+    
+      const users = [];
+  
+      const existingChat = await Chat.findOne({ chatName });
+      if (existingChat) {
+        await Club.findByIdAndDelete(club._id); // delete the club if the chat already exists
+        return res.status(400).json({ message: 'A group chat with the same name already exists' });
+      }
+  
+      const groupChat = await Chat.create({
+        chatName,
+        users,
+        isGroupChat: true,
+      });
+  
+      club.chat = groupChat._id;
+      await club.save();
+  
+      res.status(201).json({
+        club,
+        groupChat,
+      });
+    } catch (error) {
+      res.status(400).send(error);
+    }
+  });
 
 router.get('/:id', async (req, res) => {
     try {
