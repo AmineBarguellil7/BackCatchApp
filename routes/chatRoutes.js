@@ -186,8 +186,19 @@ router.put("/deletefromgroup/:chatId/", async (req, res) => {
     res.json(added);
   }
 });
-
-
+////////////delete chatroom//////////
+router.delete('/chatrooms/:chatId', async (req, res) => {
+  try {
+    const chat = await Chat.findByIdAndDelete(req.params.chatId);
+    if (!chat) {
+      return res.status(404).json({ error: 'Chatroom not found' });
+    }
+    res.json({ message: 'Chatroom deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
   
   
 
