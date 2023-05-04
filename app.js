@@ -4,7 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const cors =  require('cors')
-const {chats} =require('./data/data')
+
 
 
 
@@ -16,6 +16,7 @@ var usersRouter = require('./routes/users');
 var facebookRouter = require('./routes/facebook');
 var clubsRouter=require('./routes/clubs');
 var paymentRouter=require('./routes/payment');
+var payEventRouter=require('./routes/PaymentEvent')
 var chatRouter = require('./routes/chatRoutes');
 var mongoose = require('mongoose');
 var config = require('./database/mongodb');
@@ -42,6 +43,7 @@ app.use('/auth/facebook', facebookRouter);
 app.use('/api', paymentRouter);
 app.use('/events',eventRouter);
 app.use('/chat',chatRouter);
+app.use('/payevent',payEventRouter);
 app.use("/message", messageRoutes);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

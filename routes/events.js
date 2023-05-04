@@ -29,7 +29,7 @@ router.get('/:id', async (req, res) => {
 
 
 const multer = require('multer');
-const upload = multer({ dest: '' }); // define upload directory
+const upload = multer({ dest: 'C:/Users/Amine Barguellil/Desktop/projet pi/Ahmed/CatchApp_The_Innovators/public/img' }); // define upload directory
 
 // Create a new event
 router.post('/add',upload.single('img') ,async (req, res) => {

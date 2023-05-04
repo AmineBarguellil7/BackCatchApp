@@ -1,8 +1,5 @@
 const express = require("express");
-const Event=require('../model/event');
-const mongoose = require('mongoose');
 const User = require('../model/user');
-const Club = require('../model/club');
 const Message = require("../model/messageModel");
 
 const Chat = require("../model/chatModel");

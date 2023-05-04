@@ -3,9 +3,6 @@ var router = express.Router();
 const Club=require('../model/club');
 const User = require('../model/user');
 const Event=require("../model/event");
-const ChatRoom=require('../model/chatroom');
-
-const Message = require("../model/messageModel");
 
 const Chat = require("../model/chatModel");
 
@@ -21,29 +18,8 @@ router.get('/', async (req, res) => {
   });
 
   const multer = require('multer');
-  const upload = multer({ dest: '' }); // define upload directory
-router.post('/7add',upload.single('logo'), async (req, res) => {
-  const { name, description,address,domain } = req.body;
-    try {
-      const club = new Club({
-        name,
-        description,
-        address,
-        domain,
-        logo: req.file ? req.file.filename : undefined,
-      });
-      await club.save();
+  const upload = multer({ dest: 'C:/Users/Amine Barguellil/Desktop/projet pi/Ahmed/CatchApp_The_Innovators/public/img' }); // define upload directory
 
-
-      // Create a chat room for the club
-
-
-
-      res.status(201).send(club);
-    } catch (error) {
-      res.status(400).send(error);
-    }
-  }); 
   
   router.post('/add', upload.single('logo'), async (req, res) => {
     const { name, description, address, domain } = req.body;
@@ -65,6 +41,8 @@ router.post('/7add',upload.single('logo'), async (req, res) => {
       await club.save();
   
       const chatName = `${req.body.name} Chat`;
+
+      const organizer=club._id;
     
       const users = [];
   
@@ -78,6 +56,7 @@ router.post('/7add',upload.single('logo'), async (req, res) => {
         chatName,
         users,
         isGroupChat: true,
+        organizer
       });
   
       club.chat = groupChat._id;

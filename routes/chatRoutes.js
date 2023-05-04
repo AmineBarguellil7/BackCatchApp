@@ -1,12 +1,11 @@
 const express = require("express");
 
-const Event=require('../model/event');
-const mongoose = require('mongoose');
+
 const User = require('../model/user');
-const Club = require('../model/club');
 const router = express.Router();
 const Chat = require('../model/chatModel');
 const asyncHandler = require('express-async-handler');
+
 
 
 
@@ -61,6 +60,18 @@ router.post('/access/:id', asyncHandler(async (req, res) => {
       }
     }
   }));
+
+
+
+  router.get('/', async (req, res) => {
+    try {
+      const chats = await Chat.find();
+      res.json(chats);
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).send('Erreur serveur');
+    }
+  });
 
   ////////////////get all chats////////////
   router.get('/chats/:id', asyncHandler(async (req, res) => {
@@ -125,17 +136,21 @@ router.post('/access/:id', asyncHandler(async (req, res) => {
 
 ///////////////////add user to the groupe///////////
 
-router.put("/addtogroup/:chatId/", async (req, res) => {
-  const { chatId } = req.params;
-  const { userId } = req.body;
-  if (!Chat) {
+router.put("/addtogroup/:userId/:clubId", async (req, res) => {
+  const  userId = req.params.userId;
+  const clubId=req.params.clubId;
+  const chat=await Chat.findOne({ organizer: clubId });
+
+  if (!chat) {
     res.status(404);
     throw new Error("Chat Not Found");
   }
   
-  
+
+  if (!chat.users.includes(userId)) {
+
   const added = await Chat.findByIdAndUpdate(
-    chatId,
+    chat._id,
     {
       $push: { users: userId },
     },
@@ -146,11 +161,15 @@ router.put("/addtogroup/:chatId/", async (req, res) => {
     .populate("users", "-password")
     .populate("groupAdmin", "-password");
 
-  if (!added) {
-    res.status(404);
-    throw new Error("Chat Not Found");
-  } else {
-    res.json(added);
+    if (!added) {
+      res.status(404);
+      throw new Error("Chat Not Found");
+    } else {
+      res.json(added);
+    }
+  }
+  else {
+    res.status(400).json({ error: "User already in chat" });
   }
 });
 

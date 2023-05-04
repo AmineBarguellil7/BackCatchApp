@@ -11,6 +11,7 @@ const chatModel = mongoose.Schema(
       ref: "Message",
     },
     groupAdmin: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
+    organizer:{ type: mongoose.Schema.Types.ObjectId, ref: "clubs" }
   },
   { timestamps: true }
 );
