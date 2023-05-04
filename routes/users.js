@@ -506,8 +506,17 @@ router.get('/:id/events', async (req, res) => {
   }
 });
 
+//////////////////////methode to get the number of users////////////////////
 
+router.get('/users/count', async (req, res) => {
+  try {
+    const count = await User.countDocuments();
+    res.json({ count });
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
 
-
+///////////methode to create a chart for providers////////////
 
 module.exports = router;

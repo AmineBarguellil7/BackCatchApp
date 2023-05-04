@@ -112,13 +112,21 @@ router.put('/update/:id',upload.single('logo'), async (req, res) => {
   });  
 
 
-
-router.delete('/delete/:id', async (req, res) => {
+  router.delete('/delete/:id', async (req, res) => {
     try {
       const club = await Club.findOne({_id:req.params.id});
       if (!club) {
         return res.status(404).send();
       }
+      
+      // Find chat with the same name as club
+      const chat = await Chat.findOne({chatName: `${club.name} Chat`});
+  console.log(chat)
+      // Delete chat if it exists
+      if (chat) {
+        await chat.deleteOne();
+      }
+      
       await User.updateMany(
         { _id: { $in: club.members } }, 
         { $pull: { clubs: club._id } } 
@@ -140,6 +148,7 @@ router.delete('/delete/:id', async (req, res) => {
       res.status(500).send();
     }
   });
+
 
 
 // router.put('/:clubId/:userId/join', async (req, res) => {
