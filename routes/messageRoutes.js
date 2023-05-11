@@ -21,8 +21,9 @@ router.route("/:chatId").get(allMessages);
 
 
 ///////////////tb3ath msg//////////
-router.post("/:id", async (req, res) => {
-    const { content, chatId } = req.body;
+router.post("/:id/:chatId", async (req, res) => {
+    const chatId=req.params.chatId;
+    const { content } = req.body;
     const Id = req.params.id;
     const user = await User.findOne({ _id: Id });
   
@@ -39,15 +40,13 @@ router.post("/:id", async (req, res) => {
   
     try {
       var message = await Message.create(newMessage);
-  
-      message = await message.populate("sender", "fname profilePic");
-      message = await message.populate("chat");
+      //message = await message.populate("sender", "fname profilePic");
+      //message = await message.populate("chat");
       message = await User.populate(message, {
         path: "chat.users",
         select: "fname profilePic email",
       });
-  
-      await Chat.findByIdAndUpdate(req.body.chatId, { latestMessage: message });
+      await Chat.findByIdAndUpdate(chatId, { latestMessage: message });
   
       res.json(message);
     } catch (error) {
